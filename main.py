@@ -1,19 +1,25 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
 
 
 class PhotoEditorApp(App):
     pass
-class Display(Screen,BoxLayout):
-    def blue_filter(self,image):
-        pixel = image.load()
-        for y in range(image.size[1]):
-            for x in range(image.size[0]):
+
+class Display(Screen,BoxLayout,Image):
+
+    def loadimage(self):
+        self.ids.img.source = self.ids.pic.source.text
+    def blue_filter(self):
+        pic = self.ids.img.source
+        img = Image.open(pic)
+        pixel = img.load()
+        for y in range(img.size[1]):
+            for x in range(img.size[0]):
                 pixel[x, y] = (pixel[x, y][0] == 255, pixel[x, y][1], pixel[x, y][2])
 
-        image.save("Blue.png")
-
+        img.save("Blue.png")
     def red_filter(self,image):
         pixel = image.load()
         for y in range(image.size[1]):
@@ -45,7 +51,7 @@ class Display(Screen,BoxLayout):
         image.save("Sepia.png")
 
     def pixelate(self,image, x, y, width, height):
-        ing = Image.open(image)
+        ing = image.open(image)
         pixels = ing.load()
         for _i in range(y, height + y, 20):
             for _a in range(x, width + x, 20):
@@ -56,7 +62,7 @@ class Display(Screen,BoxLayout):
 
     def mirror_horizontal(self,image):
         list = []
-        ing = Image.open(image)
+        ing = image.open(image)
         pixels = ing.load()
         for y in range(ing.size[1]):
             list.append([])

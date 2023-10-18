@@ -6,16 +6,18 @@ Display
         GridLayout:
             size_hint: 1,.4
             rows: 4
-            Button:
-                text:""
+            Input:
+            id: pic
             Button:
                 text:"Load Image"
+                on_release: root.loadimage()
             Button:
                 text: "Mirror"
             Button:
                 text: "Inverse"
             Button:
                 text: "Blue"
+                on_release: root.blue_filter()
             Button:
                 text: "Sepia"
             Button:
@@ -24,4 +26,5 @@ Display
                 text: "Pixelate"
 
         Image:
-            source: "download.jpg"
+            id: img
+            source: ""
