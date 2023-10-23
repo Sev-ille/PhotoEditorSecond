@@ -1,13 +1,18 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen
 from PIL import Image
+from kivy.uix.widget import Widget
 
 
 class PhotoEditorApp(App):
     pass
 
-class Display(Screen,BoxLayout):
+
+
+
+class Display(Screen,BoxLayout,Widget):
 
     def loadimage(self):
         self.ids.img.source = self.ids.pic.text
@@ -60,18 +65,51 @@ class Display(Screen,BoxLayout):
         image.save("Sepia.png")
         self.ids.img.source = "Sepia.png"
 
-    def pixelate(self, x, y, width, height):
+    cordinates = []
+
+    def on_touch_up(self, touch):
+        x, y = touch.x, touch.y
+        self.cordinates.append(int(x))
+        self.cordinates.append(int(y))
+        if len(self.cordinates) > 4:
+            self.cordinates = self.cordinates[2:]
+        touch.push()
+        touch.apply_transform_2d(self.to_local)
+        ret = super(RelativeLayout, self).on_touch_up(touch)
+        touch.pop()
+        return ret
+
+    def on_touch_down(self, touch):
+        x, y = touch.x, touch.y
+        self.cordinates.append(x)
+        self.cordinates.append(y)
+        if len(self.cordinates)>4:
+            self.cordinates =self.cordinates[2:]
+        touch.push()
+        touch.apply_transform_2d(self.to_local)
+        ret = super(RelativeLayout, self).on_touch_down(touch)
+        touch.pop()
+        return ret
+
+    def pixelate(self):
         pic = self.ids.img.source
         image = Image.open(pic)
         ing = image.open(image)
         pixels = ing.load()
-        for _i in range(y, height + y, 20):
-            for _a in range(x, width + x, 20):
+        self.on_touch_down(touch)
+        self.on_touch_up(touch)
+        y = self.cordinates[1]
+        x = self.cordinates[0]
+        height = self.cordinates[3]
+        width = self.cordinates[2]
+        for _i in range(y, height, 20):
+            for _a in range(x, width, 20):
                 for s in range(20):
                     for d in range(20):
                         pixels[_a + d, _i + s] = pixels[_a, _i]
         ing.save("pixelate.png")
-        self.ids.img.source
+        self.ids.img.source = "pixelate.png"
+
         pass
 
     def mirror_horizontal(self):
